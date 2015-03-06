@@ -52,8 +52,35 @@ public class Maestro {
     }
     
     void procesarRegistro(String cadena){//SEPARAR LA CADENA 
-        //Llenar los arreglos segun correnda
+        String campo="";
+        int i=0, indice=0;
+        do{
+            if(cadena.charAt(i)!='&' | cadena.charAt(i)!='|' ){
+                campo+=cadena.charAt(i);
+            }else{
+                     antecedente[indice]=campo;
+                     operadoresAnt[indice]=String.valueOf(cadena.charAt(i));
+                     campo="";
+                     indice++;
+            }
+            i++;
+        }while (cadena.charAt(i)!='-');
+        antecedente[indice]=campo;
+        campo="";
+        indice=0;
         
+        do{
+            i++;
+            if(cadena.charAt(i)!='&' | cadena.charAt(i)!='|' ){
+                campo+=cadena.charAt(i);
+            }else{
+                     consecuente[indice]=campo;
+                     operadoresCons[indice]=String.valueOf(cadena.charAt(i));
+                     campo="";
+                     indice++;
+            }
+        }while (i<cadena.length());
+         consecuente[indice]=campo;
     }
     
     void modificar(){
