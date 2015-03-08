@@ -26,20 +26,20 @@ public class Maestro {
         //Considerar Eliminados        
         maestro=manager.Abrir(URLArchivoMaestro);
         indice=manager.Abrir(URLArchivoIndice);
-        
+        int posicion=0;
         boolean eliminado=false;
         indice.seek(0);
         do {            
             if (indice.readInt()<0) {
+                 posicion=indice.readInt();
                 eliminado=true;
             }
         } while (indice.getFilePointer()<indice.length() | eliminado==true);
         
         if (eliminado) {
-             indice.seek(indice.getFilePointer());
-             maestro.seek(indice.readInt());
+             indice.seek(indice.getFilePointer()-4);
+             maestro.seek(posicion);
              indice.writeInt(llave);
-             indice.writeInt((int)(maestro.getFilePointer()));
         }else{
              maestro.seek(maestro.length());
              indice.seek(indice.length());
@@ -108,7 +108,7 @@ public class Maestro {
         indice.seek(0);
         do {            
             if (indice.readInt()==llave) {
-                indice.seek(indice.getFilePointer());
+                indice.seek(indice.getFilePointer()-4);
                 indice.writeInt(((-1)*llave));
                 eliminado=true;
             }
