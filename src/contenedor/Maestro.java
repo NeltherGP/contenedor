@@ -27,10 +27,25 @@ public class Maestro {
         maestro=manager.Abrir(URLArchivoMaestro);
         indice=manager.Abrir(URLArchivoIndice);
         
-        maestro.seek(maestro.length());
-        indice.seek(indice.length());
-        indice.writeInt(llave);
-        indice.writeInt((int)(maestro.length()));
+        boolean eliminado=false;
+        indice.seek(0);
+        do {            
+            if (indice.readInt()<0) {
+                eliminado=true;
+            }
+        } while (indice.getFilePointer()<indice.length() | eliminado==true);
+        
+        if (eliminado) {
+             indice.seek(indice.getFilePointer());
+             maestro.seek(indice.readInt());
+             indice.writeInt(llave);
+             indice.writeInt((int)(maestro.getFilePointer()));
+        }else{
+             maestro.seek(maestro.length());
+             indice.seek(indice.length());
+             indice.writeInt(llave);
+             indice.writeInt((int)(maestro.length()));
+        }
         
         maestro.writeInt(llave);
         for (int i = 0; i < antecedente.length; i++) {
@@ -87,7 +102,18 @@ public class Maestro {
         
     }
     
-    void eliminar(){
+    void eliminar(int llave) throws IOException{
+        indice=manager.Abrir(URLArchivoIndice);
+        boolean eliminado=false;
+        indice.seek(0);
+        do {            
+            if (indice.readInt()==llave) {
+                indice.seek(indice.getFilePointer());
+                indice.writeInt(((-1)*llave));
+                eliminado=true;
+            }
+            indice.readInt();
+        } while (indice.getFilePointer()<indice.length() | eliminado==true);
         
     }
     
