@@ -41,11 +41,15 @@ public class Contenedor {
                         break;
                 case 2: System.out.println("Llave de la regla a eliminar");
                         k = c.A_leer.nextInt();
-                        c.master.eliminar();
+                        c.master.eliminar(k);
                         break;
                 case 3:System.out.println("Llave de la regla a modificar");
                        k = c.A_leer.nextInt();
-                       c.master.modificar();
+                       System.out.println("Clave del campo");
+                       String campo=c.A_leer.next();
+                       System.out.println("Nueva informacion");
+                       String campoNuevo=c.A_leer.next();
+                       c.master.modificar(k, campo, campoNuevo);
                        break;
                 case 4: //BUSCAR 
                         break;

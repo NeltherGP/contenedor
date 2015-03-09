@@ -14,28 +14,31 @@ public class Maestro {
     String URLArchivoMaestro="archivos/maestro";
     String URLArchivoIndice="archivos/indice";
 
-    String antecedente  [] = new String [5];
-    String operadoresAnt [] = new String [4];
-    String consecuente [] = new String [5];
-    String operadoresCons[]= new String [4];
+    String antecedente  [] =  {" "," "," "," "," "};
+    String operadoresAnt [] = {" "," "," "," "};
+    String consecuente [] = {" "," "," "," "," "};
+    String operadoresCons[]= {" "," "," "," "};
 
     
     void insertar (int llave, String registro ) throws IOException{
         
         procesarRegistro(registro);
+
+        
         //Considerar Eliminados        
         maestro=manager.Abrir(URLArchivoMaestro);
         indice=manager.Abrir(URLArchivoIndice);
         int posicion=0;
         boolean eliminado=false;
         indice.seek(0);
+        if(indice.length()!=0){
         do {            
             if (indice.readInt()<0) {
                  posicion=indice.readInt();
-                eliminado=true;
+                 eliminado=true;
             }
-        } while (indice.getFilePointer()<indice.length() | eliminado==true);
-        
+        } while (indice.getFilePointer()<indice.length() || eliminado!=true);
+        }
         if (eliminado) {
              indice.seek(indice.getFilePointer()-4);
              maestro.seek(posicion);
@@ -64,14 +67,23 @@ public class Maestro {
             
         }
         
+        maestro.close();
+        indice.close();
+        
     }
     
     void procesarRegistro(String cadena){//SEPARAR LA CADENA 
         String campo="";
         int i=0, indice=0;
         do{
-            if(cadena.charAt(i)!='&' | cadena.charAt(i)!='|' ){
-                campo+=cadena.charAt(i);
+            if(cadena.charAt(i)!='&')
+                if(cadena.charAt(i)!='|' ){
+                     campo+=cadena.charAt(i);
+                }else{
+                     antecedente[indice]=campo;
+                     operadoresAnt[indice]=String.valueOf(cadena.charAt(i));
+                     campo="";
+                     indice++;
             }else{
                      antecedente[indice]=campo;
                      operadoresAnt[indice]=String.valueOf(cadena.charAt(i));
@@ -86,20 +98,86 @@ public class Maestro {
         
         do{
             i++;
-            if(cadena.charAt(i)!='&' | cadena.charAt(i)!='|' ){
-                campo+=cadena.charAt(i);
-            }else{
+            if(cadena.charAt(i)!='&')
+                if(cadena.charAt(i)!='|' ){
+                     campo+=cadena.charAt(i);
+                }else{
+                     consecuente[indice]=campo;
+                     operadoresCons[indice]=String.valueOf(cadena.charAt(i));
+                     campo="";
+                     indice++;
+                }
+            else{
                      consecuente[indice]=campo;
                      operadoresCons[indice]=String.valueOf(cadena.charAt(i));
                      campo="";
                      indice++;
             }
-        }while (i<cadena.length());
+        }while (i<cadena.length()-1);
          consecuente[indice]=campo;
     }
     
-    void modificar(){
+    void modificar(int llave, String campo, String nuevoCampo) throws IOException{
         
+        maestro=manager.Abrir(URLArchivoMaestro);
+        indice=manager.Abrir(URLArchivoIndice);
+        int Ant_Con=0;
+        int posMaestro=0;
+        int tamaño=0;
+        boolean buscar=false;
+        indice.seek(0);
+        do {            
+            if (indice.readInt()==llave) {
+                posMaestro=indice.readInt();
+                buscar=true;
+            }
+            indice.seek(indice.getFilePointer()+4);
+            
+        } while (indice.getFilePointer()<indice.length() || buscar!=true);
+      
+        
+        if (buscar) {
+            switch (campo.charAt(0)) {
+                case 'A': Ant_Con=0;
+                    break;
+                case 'C': Ant_Con=38;
+                    break;
+                case 'O': switch (campo.charAt(1)) {
+                        case 'A': Ant_Con=0;
+                            break;
+                        case 'C': Ant_Con=38;
+                            break;
+                        default:
+                            System.out.println("Campo invalido");
+                    }
+                    break;
+                default:
+                    System.out.println("Campo invalido");
+            }
+         
+            int posicion=0;
+            int posCampo=Integer.parseInt(String.valueOf(campo.charAt(2)));
+            System.out.println("caxmp  "+posCampo);
+            switch (campo.charAt(0)) {
+                case 'A': 
+                case 'C': posicion=((posCampo-1)*6)+((posCampo-1)*2)+Ant_Con;
+                          tamaño=3;
+                    break;
+                case 'O': posicion=(posCampo*6)+((posCampo-1)*2)+Ant_Con;
+                          tamaño=1;
+                    break;
+                default:
+                    throw new AssertionError();
+            }
+            posMaestro+=posicion+4;
+            maestro.seek(posMaestro);
+            manager.m_EscribirString(nuevoCampo, tamaño, maestro);   
+        }else{
+            System.out.println("La llave no existe");
+        }
+        
+        maestro.close();
+        indice.close();
     }
     
     void eliminar(int llave) throws IOException{
@@ -109,12 +187,13 @@ public class Maestro {
         do {            
             if (indice.readInt()==llave) {
                 indice.seek(indice.getFilePointer()-4);
-                indice.writeInt(((-1)*llave));
+                int valor=llave*(-1);
+                indice.writeInt(valor);
                 eliminado=true;
             }
             indice.readInt();
         } while (indice.getFilePointer()<indice.length() | eliminado==true);
-        
+        indice.close();
     }
     
     void mostrarMaestro(){
