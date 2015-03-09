@@ -13,6 +13,7 @@ public class Contenedor {
    Scanner A_leer=new Scanner(System.in);
    Maestro master = new Maestro();
    static Arbol tree = new Arbol();
+   static Indice indice = new Indice();
    
     public static void main(String[] args) throws IOException {
        
@@ -25,9 +26,9 @@ public class Contenedor {
             System.out.println("1.-Insertar");
             System.out.println("2.-Eliminar");
             System.out.println("3.-Modificar");
-            System.out.println("4.-Buscar");
             System.out.println("<<ARBOL>>");
-            System.out.println("5.-Insertar");
+            System.out.println("4.-Crear Árbol");
+            System.out.println("5.-Buscar Anchura");
             System.out.println("6.-Buscar Profundidad");
             System.out.println("7.-Preorden");
             System.out.println("8.-Entreoden");
@@ -51,23 +52,25 @@ public class Contenedor {
                        String campoNuevo=c.A_leer.next();
                        c.master.modificar(k, campo, campoNuevo);
                        break;
-                case 4: //BUSCAR 
-                        break;
-                case 5: System.out.println("Llave: ");
+                case 5: System.out.println("Llave a buscar en el arbol: ");     
                         k=c.A_leer.nextInt();
-                        System.out.println("Posicion: ");
-                        o=c.A_leer.nextInt();
-                        c.tree.insertart(k, o);
+                        c.indice.arbolito.busquedaAnchura(k);
+                         break;
+                case 4: c.indice.leerIndice();
                         break;      
                 case 6: System.out.println("Llave a buscar en el arbol: ");     
                         k=c.A_leer.nextInt();
-                        c.tree.buscarProfundidad(k);
+                        c.indice.arbolito.buscarProfundidad(k);
+                        break;
                 case 7: 
-                        c.tree.preOrden(tree.raiz);
+                        c.indice.arbolito.preOrden(indice.arbolito.raiz);
+                    break;
                 case 8: 
-                        c.tree.entreOrden(tree.raiz);
+                        c.indice.arbolito.entreOrden(indice.arbolito.raiz);
+                    break;
                 case 9: 
-                        c.tree.postOrden(tree.raiz);
+                        c.indice.arbolito.postOrden(indice.arbolito.raiz);
+                    break;
                  
             }
         }while(opc!=0);

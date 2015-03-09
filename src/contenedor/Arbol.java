@@ -1,6 +1,8 @@
 
 package contenedor;
 
+import java.util.LinkedList;
+
 /**
  *
  * @author nelther
@@ -88,10 +90,38 @@ public void buscarProfundidad(int llave){
         }
     }
 }
+
+public void busquedaAnchura(int llave){
+    int peso=0;
+    boolean bandera=false;
+    LinkedList<Nodo> cola=new LinkedList();
+    cola.add(raiz);
+    do{
+        if (cola.getFirst().llave!=llave){
+            if (cola.getFirst().izq!=null) {
+                 cola.add(cola.getFirst().izq);
+            }
+            if (cola.getFirst().der!=null) {
+                 cola.add(cola.getFirst().der);
+            }
+            cola.poll();
+            peso++;
+        }
+        else{
+         System.out.println("LLave encontrada \nPeso: "+peso);
+         bandera=true;
+         break;
+        }
+    }while(!cola.isEmpty());
+    if (!bandera) {
+        System.out.println("Llave no encontrada!");
+    }
+}
+
 public void preOrden(Nodo raiz){
     Nodo l,d;
     if(raiz!=null){
-       procesar();
+       procesar(raiz);
        l=raiz.izq;
        preOrden(l);
        d=raiz.der;
@@ -103,7 +133,7 @@ public void entreOrden(Nodo raiz){
     if(raiz!=null){
        l=raiz.izq;
        entreOrden(l);
-       procesar();
+       procesar(raiz);
        d=raiz.der;
        entreOrden(d);
    }
@@ -113,12 +143,13 @@ public void postOrden(Nodo raiz){
     if(raiz!=null){
        l=raiz.izq;
        postOrden(l);
-       procesar();
+       
        d=raiz.der;
        postOrden(d);
+       procesar(raiz);
    }
 }
-public void procesar(){
-    
+public void procesar(Nodo raiz){
+    System.out.println(raiz.llave);
 }
 }

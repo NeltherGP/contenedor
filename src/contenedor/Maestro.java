@@ -21,26 +21,35 @@ public class Maestro {
 
     
     void insertar (int llave, String registro ) throws IOException{
-        
+        for (int i = 0; i < 5; i++) {
+            antecedente[i]="";
+            consecuente[i]="";
+        }
+        for (int i = 0; i < 4; i++) {
+            operadoresAnt[i]="";
+            operadoresCons[i]="";
+        }
         procesarRegistro(registro);
 
         
         //Considerar Eliminados        
         maestro=manager.Abrir(URLArchivoMaestro);
         indice=manager.Abrir(URLArchivoIndice);
-        int posicion=0;
+        int posicion=0, seek=0;
         boolean eliminado=false;
         indice.seek(0);
         if(indice.length()!=0){
-        do {            
-            if (indice.readInt()<0) {
+        do {    
+            int l=indice.readInt();
+            if (l<0) {
+                 seek=(int)indice.getFilePointer()-2;
                  posicion=indice.readInt();
                  eliminado=true;
             }
-        } while (indice.getFilePointer()<indice.length() || eliminado!=true);
+        } while (indice.getFilePointer()<indice.length()-2);
         }
         if (eliminado) {
-             indice.seek(indice.getFilePointer()-4);
+             indice.seek(seek);
              maestro.seek(posicion);
              indice.writeInt(llave);
         }else{
@@ -66,6 +75,8 @@ public class Maestro {
             }
             
         }
+        
+        
         
         maestro.close();
         indice.close();
@@ -182,19 +193,19 @@ public class Maestro {
     
     void eliminar(int llave) throws IOException{
         indice=manager.Abrir(URLArchivoIndice);
-        boolean eliminado=false;
         indice.seek(0);
         do {            
             if (indice.readInt()==llave) {
                 indice.seek(indice.getFilePointer()-4);
                 int valor=llave*(-1);
                 indice.writeInt(valor);
-                eliminado=true;
             }
             indice.readInt();
-        } while (indice.getFilePointer()<indice.length() | eliminado==true);
+        } while (indice.getFilePointer()<indice.length());
         indice.close();
     }
+    
+    
     
     void mostrarMaestro(){
         
