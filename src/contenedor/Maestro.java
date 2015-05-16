@@ -13,19 +13,25 @@ public class Maestro {
     RandomAccessFile maestro,indice;
     String URLArchivoMaestro="archivos/maestro";
     String URLArchivoIndice="archivos/indice";
-
-    String antecedente  [] =  {" "," "," "," "," "};
-    String operadoresAnt [] = {" "," "," "," "};
-    String consecuente [] = {" "," "," "," "," "};
-    String operadoresCons[]= {" "," "," "," "};
+    
+    int tamañoAnt_Con=20;
+    int numAnt_Con=5; //variable para definir maximo de antecedentes y consecuentes.
+    int tamanoAntecedente=((tamañoAnt_Con*numAnt_Con)+(numAnt_Con-1))*2;
+    int tamañoConsecuente=tamanoAntecedente;
+    int tamañoRegistro=tamanoAntecedente+tamañoAnt_Con+6;
+            
+    String antecedente  [] = new String[numAnt_Con];
+    String operadoresAnt [] = new String[numAnt_Con-1];
+    String consecuente [] = new String[numAnt_Con];
+    String operadoresCons[]= new String[numAnt_Con-1] ;
 
     
     void insertar (int llave, String registro ) throws IOException{
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < numAnt_Con; i++) {
             antecedente[i]="";
             consecuente[i]="";
         }
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < numAnt_Con-1; i++) {
             operadoresAnt[i]="";
             operadoresCons[i]="";
         }
@@ -61,7 +67,7 @@ public class Maestro {
         
         maestro.writeInt(llave);
         for (int i = 0; i < antecedente.length; i++) {
-            manager.m_EscribirString(antecedente[i], 3, maestro);
+            manager.m_EscribirString(antecedente[i], tamañoAnt_Con, maestro);
             if(i<antecedente.length-1){
                 manager.m_EscribirString(operadoresAnt[i], 1, maestro);
             }
@@ -69,7 +75,7 @@ public class Maestro {
         }
         
         for (int i = 0; i < consecuente.length; i++) {
-            manager.m_EscribirString(consecuente[i], 3, maestro);
+            manager.m_EscribirString(consecuente[i], tamañoAnt_Con, maestro);
             if(i<consecuente.length-1){
                 manager.m_EscribirString(operadoresCons[i], 1, maestro);
             }
@@ -151,12 +157,12 @@ public class Maestro {
             switch (campo.charAt(0)) {
                 case 'A': Ant_Con=0;
                     break;
-                case 'C': Ant_Con=38;
+                case 'C': Ant_Con=tamanoAntecedente;
                     break;
                 case 'O': switch (campo.charAt(1)) {
                         case 'A': Ant_Con=0;
                             break;
-                        case 'C': Ant_Con=38;
+                        case 'C': Ant_Con=tamañoConsecuente;
                             break;
                         default:
                             System.out.println("Campo invalido");
@@ -168,13 +174,13 @@ public class Maestro {
          
             int posicion=0;
             int posCampo=Integer.parseInt(String.valueOf(campo.charAt(2)));
-            System.out.println("caxmp  "+posCampo);
+           // System.out.println("caxmp  "+posCampo);
             switch (campo.charAt(0)) {
                 case 'A': 
-                case 'C': posicion=((posCampo-1)*6)+((posCampo-1)*2)+Ant_Con;
-                          tamaño=3;
+                case 'C': posicion=((posCampo-1)*(tamañoAnt_Con*2))+((posCampo-1)*2)+Ant_Con;
+                          tamaño=tamañoAnt_Con;
                     break;
-                case 'O': posicion=(posCampo*6)+((posCampo-1)*2)+Ant_Con;
+                case 'O': posicion=(posCampo*(tamañoAnt_Con*2))+((posCampo-1)*2)+Ant_Con;
                           tamaño=1;
                     break;
                 default:
